@@ -38,7 +38,7 @@ namespace StudentExercises.Controllers
                     cmd.CommandText = @" SELECT Id, Name FROM Cohort";
 
                     SqlDataReader reader = cmd.ExecuteReader();
-                    while(reader.Read())
+                    while (reader.Read())
                     {
                         cohorts.Add(new Cohort()
                         {
@@ -60,26 +60,41 @@ namespace StudentExercises.Controllers
         // GET: Cohorts/Create
         public ActionResult Create()
         {
+
             return View();
         }
 
         // POST: Cohorts/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Cohort cohort)
         {
             try
             {
-                // TODO: Add insert logic here
+                
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @" 
+                         INSERT INTO Cohort
+                            ([Name]) VALUES ( @name) 
+                    ";
+                        cmd.Parameters.AddWithValue("name", cohort.Name);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                        // TODO: Add insert logic here
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
+                        return RedirectToAction(nameof(Index));
+                    }
+                    catch
+                    {
+                        return View();
+                    }
+                }
+            
         // GET: Cohorts/Edit/5
         public ActionResult Edit(int id)
         {
