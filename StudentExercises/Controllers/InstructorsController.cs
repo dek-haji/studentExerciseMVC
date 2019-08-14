@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using StudentExercises.Models;
+using StudentExercises.Models.ViewModels;
 
 namespace StudentExercises.Controllers
 {
@@ -95,9 +96,8 @@ namespace StudentExercises.Controllers
         // GET: Instructors/Create
         public ActionResult Create()
         {
-          
-                
-            return View();
+            var viewModel = new InstructorCreateViewModel(_config.GetConnectionString("DefaultConnection"));
+            return View(viewModel);
         }
 
         // POST: Instructors/Create
@@ -112,11 +112,11 @@ namespace StudentExercises.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"   INSERT INTO Cohort (
+                        cmd.CommandText = @"   INSERT INTO Instructor (
                                 FirstName, 
                                 LastName, 
                                 SlackHandle,
-                                Specialty
+                                Specialty,
                                 CohortId
                             ) VALUES (
                                 @firstName,
