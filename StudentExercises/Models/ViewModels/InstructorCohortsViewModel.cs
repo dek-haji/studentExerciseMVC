@@ -3,10 +3,10 @@ using System.Data.SqlClient;
 
 namespace StudentExercises.Models.ViewModels
 {
-    public class StudentInstructorViewModel
+    public class InstructorCohortsViewModel
     {
 
-        public List<Student> Students { get; set; }
+        public List<Cohort> Cohorts { get; set; }
         public List<Instructor> Instructors { get; set; }
 
         private string _connectionString;
@@ -19,14 +19,14 @@ namespace StudentExercises.Models.ViewModels
             }
         }
 
-        public StudentInstructorViewModel(string connectionString)
+        public InstructorCohortsViewModel(string connectionString)
         {
             _connectionString = connectionString;
-            GetAllStudents();
+            GetAllCohorts();
             GetAllInstructors();
         }
 
-        private void GetAllStudents()
+        private void GetAllCohorts()
         {
             using (SqlConnection conn = Connection)
             {
@@ -38,19 +38,19 @@ namespace StudentExercises.Models.ViewModels
                             Id,
                             FirstName,
                             LastName,
+                            Specialty,
                             SlackHandle
-                        FROM Student";
+                        FROM Instructor";
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    Students = new List<Student>();
+                    Cohorts = new List<Cohort>();
                     while (reader.Read())
                     {
-                        Students.Add(new Student
+                        Cohorts.Add(new Cohort
                         {
-                            StudentId = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                         
                         });
                     }
 
@@ -83,8 +83,8 @@ namespace StudentExercises.Models.ViewModels
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            Specialty = reader.GetString(reader.GetOrdinal("Specialty")),
                             SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
-                            
                         });
                     }
 

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using StudentExercises.Models;
+using StudentExercises.Models.ViewModels;
 
 namespace StudentExercises.Controllers
 {
@@ -63,23 +64,77 @@ namespace StudentExercises.Controllers
         // GET: Instructors/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            Instructor instructor = null;
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                       SELECT Id, FirstName, LastName, SlackHandle, Specialty, CohortId
+                        FROM Instructor
+                         WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    if(reader.Read())
+                    {
+                        instructor = new Instructor()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
+                            Specialty = reader.GetString(reader.GetOrdinal("Specialty")),
+                            CohortId = reader.GetInt32(reader.GetOrdinal("CohortId"))
+                        };
+                    }
+                    return View(instructor);
+                }
+            }
         }
 
         // GET: Instructors/Create
         public ActionResult Create()
         {
-            return View();
+            var viewModel = new InstructorCreateViewModel(_config.GetConnectionString("DefaultConnection"));
+            return View(viewModel);
         }
 
         // POST: Instructors/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Instructor instructor)
         {
             try
             {
-                // TODO: Add insert logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"   INSERT INTO Instructor (
+                                FirstName, 
+                                LastName, 
+                                SlackHandle,
+                                Specialty,
+                                CohortId
+                            ) VALUES (
+                                @firstName,
+                                @lastName,
+                                @slackHandle,
+                                @specialty,           
+                                @cohortId
+                            )";
+
+                        cmd.Parameters.AddWithValue("@firstName", instructor.FirstName);
+                        cmd.Parameters.AddWithValue("@lastName", instructor.LastName);
+                        cmd.Parameters.AddWithValue("@slackHandle", instructor.SlackHandle);
+                        cmd.Parameters.AddWithValue("@specialty", instructor.Specialty);
+                        cmd.Parameters.AddWithValue("@cohortId", instructor.CohortId);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
 
                 return RedirectToAction(nameof(Index));
             }
