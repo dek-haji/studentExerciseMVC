@@ -90,11 +90,22 @@ namespace StudentExercises.Controllers
         // POST: Exercises/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Exercise exercise)
         {
             try
             {
                 // TODO: Add insert logic here
+                using(SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using(SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @" INSERT INTO Exercise ([Name], Language) VALUES (@name, @language)";
+                        cmd.Parameters.AddWithValue("name", exercise.Name);
+                        cmd.Parameters.AddWithValue("language", exercise.Language);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
 
                 return RedirectToAction(nameof(Index));
             }
