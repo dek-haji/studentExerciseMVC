@@ -84,7 +84,7 @@ namespace StudentExercises.Models.ViewModels
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
-                            
+
                         });
                     }
 

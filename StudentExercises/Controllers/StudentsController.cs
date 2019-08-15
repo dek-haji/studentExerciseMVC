@@ -186,7 +186,14 @@ namespace StudentExercises.Controllers
             try
             {
                 // TODO: Add delete logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
 
+                    }
+                }
                 return RedirectToAction(nameof(Index));
             }
             catch
